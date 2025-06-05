@@ -1,0 +1,116 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+
+  MyVPC: 
+    Type: AWS::EC2::VPC::Id
+   
+  MySubnet1:
+    Type: AWS::EC2::Subnet::Id
+
+  MySubnet2:
+    Type: AWS::EC2::Subnet::Id
+
+
+Resources:
+
+  MyASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties: 
+      AutoScalingGroupName: ASG
+      MinSize: 1
+      MaxSize: 3
+      DesiredCapacity: 2
+      VPCZoneIdentifier:
+        - !Ref MySubnet1
+        - !Ref MySubnet2
+      TargetGroupARNs: 
+        - !Ref MyTargetGroup
+      LaunchTemplate:
+          LaunchTemplateId: !Ref MyLaunchTemplate
+          Version: !GetAtt MyLaunchTemplate.LatestVersionNumber
+
+  MyLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: Launch
+      LaunchTemplateData:
+        ImageId: ami-00871561d50c5c8f1
+        InstanceType: t2.micro
+        SecurityGroupIds: 
+          - !Ref EC2Security
+         
+  MyTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: TargetGroup1
+      Port: 80
+      Protocol: HTTP
+      VpcId: !Ref MyVPC
+      TargetType: instance 
+    
+  MyALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer 
+    Properties: 
+      Name: ALB
+      Scheme: internet-facing
+      Subnets:
+        - !Ref MySubnet1
+        - !Ref MySubnet2 
+      SecurityGroups: 
+        - !Ref ALBSecurity
+  
+  MyALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties: 
+      LoadBalancerArn: !Ref MyALB
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref MyTargetGroup
+
+  MyDistribution:
+    Type: AWS::CloudFront::Distribution 
+    Properties:
+      DistributionConfig:
+        Enabled: true 
+        Origins: 
+          - Id: Origin1
+            DomainName: !GetAtt MyALB.DNSName
+            CustomOriginConfig:
+              HTTPPort: 80
+              OriginProtocolPolicy: http-only
+        DefaultCacheBehavior:
+          TargetOriginId: Origin1
+          ViewerProtocolPolicy: allow-all 
+          AllowedMethods:
+            - GET 
+            - HEAD
+          CachedMethods:
+            - GET 
+            - HEAD 
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          OriginRequestPolicyId: 216adef6-5c7f-47e4-b989-5492eafa07d3
+
+  ALBSecurity:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound traffic at port 80 from my IP 
+      VpcId: !Ref MyVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  EC2Security:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound traffic at port 80 from MyALB
+      VpcId: !Ref MyVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref ALBSecurity
