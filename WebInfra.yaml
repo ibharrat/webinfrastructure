@@ -11,6 +11,10 @@ Parameters:
   MySubnet2:
     Type: AWS::EC2::Subnet::Id
 
+  MyAMI:
+    Type: AWS::EC2::Image::Id
+    Description: AMI to use for Auto Scaling Group
+
 
 Resources:
 
