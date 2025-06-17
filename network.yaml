@@ -12,7 +12,6 @@ Resources:
         - Key: Name
           Value: MyVPC
 
-
   MyPublicSubnet1:
     Type: AWS::EC2::Subnet 
     Properties:

@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+
+  MyVpcId:
+    Type: AWS::EC2::VPC::Id
+
+  MyPublicSubnet1Id:
+    Type: AWS::EC2::Subnet::Id
+
+  MyPublicSubnet2Id:
+    Type: AWS::EC2::Subnet::Id
+
+  MyAlbSgId:
+    Type: String 
+
+
+Resources:
+         
+  MyTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: TargetGroup1
+      Port: 80
+      Protocol: HTTP
+      VpcId: !Ref MyVPC
+      TargetType: instance 
