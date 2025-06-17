@@ -55,8 +55,8 @@ Outputs:
     Export:
       Name: !Sub "${AWS::StackName}-TargetGroupArn"
 
-  AlbDns:
+  AlbDnsName:
     Value: !GetAtt MyAlb.DNSName
     Export:
-      Name: !Sub "${AWS::StackName}-AlbDns"
+      Name: !Sub "${AWS::StackName}-AlbDnsName"
   
