@@ -20,8 +20,43 @@ Resources:
   MyTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: TargetGroup1
+      Name: MyTargetGroup
       Port: 80
       Protocol: HTTP
-      VpcId: !Ref MyVPC
+      VpcId: !Ref MyVpcId
       TargetType: instance 
+
+  MyAlb:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer 
+    Properties: 
+      Name: MyAlb
+      Scheme: internet-facing
+      Subnets:
+        - !Ref MyPublicSubnet1Id
+        - !Ref MyPublicSubnet2Id
+      SecurityGroups: 
+        - !Ref MyAlbSgId
+
+  MyALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties: 
+      LoadBalancerArn: !Ref MyAlb
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref MyTargetGroup
+
+
+Outputs:
+
+  TargetGroupArn: 
+    Value: !Ref MyTargetGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-TargetGroupArn"
+
+  AlbDns:
+    Value: !GetAtt MyAlb.DNSName
+    Export:
+      Name: !Sub "${AWS::StackName}-AlbDns"
+  

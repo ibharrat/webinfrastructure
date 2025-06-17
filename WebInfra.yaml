@@ -80,13 +80,13 @@ Resources:
       DistributionConfig:
         Enabled: true 
         Origins: 
-          - Id: Origin1
+          - Id: AlbOrigin
             DomainName: !GetAtt MyALB.DNSName
             CustomOriginConfig:
               HTTPPort: 80
               OriginProtocolPolicy: http-only
         DefaultCacheBehavior:
-          TargetOriginId: Origin1
+          TargetOriginId: AlbOrigin
           ViewerProtocolPolicy: allow-all 
           AllowedMethods:
             - GET 
