@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Resources:
+
+  NetworkStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://web-cf-templates3.s3.us-east-1.amazonaws.com/network.yaml
+
+  SecurityGroupStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://web-cf-templates3.s3.us-east-1.amazonaws.com/securitygroup.yaml
+      Parameters: 
+        MyVpcId: !GetAtt NetworkStack.Outputs.VpcId
+
+  LoadBalancerStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://web-cf-templates3.s3.us-east-1.amazonaws.com/loadbalancer.yaml
+      Parameters:
+        MyVpcId: !GetAtt NetworkStack.Outputs.VpcId
+        MyPublicSubnet1Id: !GetAtt NetworkStack.Outputs.PublicSubnet1Id
+        MyPublicSubnet2Id: !GetAtt NetworkStack.Outputs.PublicSubnet2Id
+        MyAlbSgId: !GetAtt SecurityGroupStack.Outputs.AlbSgId
+
+  ComputeStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://web-cf-templates3.s3.us-east-1.amazonaws.com/compute.yaml
+      Parameters:
+        MyPrivateSubnet1Id: !GetAtt NetworkStack.Outputs.PrivateSubnet1Id
+        MyPrivateSubnet2Id: !GetAtt NetworkStack.Outputs.PrivateSubnet2Id
+        MyTargetGroupArn: !GetAtt LoadBalancerStack.Outputs.TargetGroupArn
+        MyEc2SgId: !GetAtt SecurityGroupStack.Outputs.Ec2SgId
+
+  CloudFrontStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://web-cf-templates3.s3.us-east-1.amazonaws.com/cloudfront.yaml
+      Parameters:
+        MyAlbDnsName: !GetAtt LoadBalancerStack.Outputs.AlbDnsName

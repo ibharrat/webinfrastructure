@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 
 Resources:
 
-  MyVPC:
+  MyVpc:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 172.31.0.0/16
@@ -10,12 +10,12 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: MyVPC
+          Value: MyVpc
 
   MyPublicSubnet1:
     Type: AWS::EC2::Subnet 
     Properties:
-      VpcId: !Ref MyVPC
+      VpcId: !Ref MyVpc
       CidrBlock: 172.31.1.0/24
       AvailabilityZone: us-east-2a
       MapPublicIpOnLaunch: true
@@ -26,7 +26,7 @@ Resources:
   MyPublicSubnet2:
     Type: AWS::EC2::Subnet 
     Properties:
-      VpcId: !Ref MyVPC
+      VpcId: !Ref MyVpc
       CidrBlock: 172.31.2.0/24
       AvailabilityZone: us-east-2b
       MapPublicIpOnLaunch: true
@@ -37,7 +37,7 @@ Resources:
   MyPrivateSubnet1:
     Type: AWS::EC2::Subnet 
     Properties:
-      VpcId: !Ref MyVPC
+      VpcId: !Ref MyVpc
       CidrBlock: 172.31.3.0/24
       AvailabilityZone: us-east-2a
       MapPublicIpOnLaunch: false
@@ -48,7 +48,7 @@ Resources:
   MyPrivateSubnet2:
     Type: AWS::EC2::Subnet 
     Properties:
-      VpcId: !Ref MyVPC   
+      VpcId: !Ref MyVpc   
       CidrBlock: 172.31.4.0/24
       AvailabilityZone: us-east-2b
       MapPublicIpOnLaunch: false
@@ -60,26 +60,16 @@ Resources:
 Outputs:
   
   VpcId:
-    Value: !Ref MyVPC
-    Export:
-      Name: !Sub "${AWS::StackName}-VPCId"
+    Value: !Ref MyVpc
 
   PublicSubnet1Id: 
     Value: !Ref MyPublicSubnet1
-    Export:
-      Name: !Sub ${AWS::StackName}-PublicSubnet1Id
 
   PublicSubnet2Id: 
     Value: !Ref MyPublicSubnet2
-    Export:
-      Name: !Sub ${AWS::StackName}-PublicSubnet2Id
 
   PrivateSubnet1Id: 
     Value: !Ref MyPrivateSubnet1
-    Export:
-      Name: !Sub ${AWS::StackName}-PrivateSubnet1Id
 
   PrivateSubnet2Id: 
     Value: !Ref MyPrivateSubnet2
-    Export:
-      Name: !Sub ${AWS::StackName}-PrivateSubnet2Id
