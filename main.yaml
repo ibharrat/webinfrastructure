@@ -5,19 +5,19 @@ Resources:
   NetworkStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://web-cf-templates3.s3.us-east-1.amazonaws.com/network.yaml
+      TemplateURL: https://web-cf-templates-4.s3.us-east-2.amazonaws.com/network.yaml
 
   SecurityGroupStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://web-cf-templates3.s3.us-east-1.amazonaws.com/securitygroup.yaml
+      TemplateURL: https://web-cf-templates-4.s3.us-east-2.amazonaws.com/securitygroup.yaml
       Parameters: 
         MyVpcId: !GetAtt NetworkStack.Outputs.VpcId
 
   LoadBalancerStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://web-cf-templates3.s3.us-east-1.amazonaws.com/loadbalancer.yaml
+      TemplateURL: https://web-cf-templates-4.s3.us-east-2.amazonaws.com/loadbalancer.yaml
       Parameters:
         MyVpcId: !GetAtt NetworkStack.Outputs.VpcId
         MyPublicSubnet1Id: !GetAtt NetworkStack.Outputs.PublicSubnet1Id
@@ -27,7 +27,7 @@ Resources:
   ComputeStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://web-cf-templates3.s3.us-east-1.amazonaws.com/compute.yaml
+      TemplateURL: https://web-cf-templates-4.s3.us-east-2.amazonaws.com/compute.yaml
       Parameters:
         MyPrivateSubnet1Id: !GetAtt NetworkStack.Outputs.PrivateSubnet1Id
         MyPrivateSubnet2Id: !GetAtt NetworkStack.Outputs.PrivateSubnet2Id
@@ -37,6 +37,6 @@ Resources:
   CloudFrontStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://web-cf-templates3.s3.us-east-1.amazonaws.com/cloudfront.yaml
+      TemplateURL: https://web-cf-templates-4.s3.us-east-2.amazonaws.com/cloudfront.yaml
       Parameters:
         MyAlbDnsName: !GetAtt LoadBalancerStack.Outputs.AlbDnsName
