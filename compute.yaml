@@ -14,6 +14,9 @@ Parameters:
   MyEc2SgId:
     Type: String 
 
+  MyAmiId:
+    Type: String
+
 
 Resources:
   
@@ -38,7 +41,7 @@ Resources:
     Properties:
       LaunchTemplateName: Launch
       LaunchTemplateData:
-        ImageId: ami-00871561d50c5c8f1
+        ImageId: !Ref MyAmiId 
         InstanceType: t2.micro
         SecurityGroupIds: 
           - !Ref MyEc2SgId

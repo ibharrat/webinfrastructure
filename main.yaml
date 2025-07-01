@@ -2,20 +2,13 @@ AWSTemplateFormatVersion: "2010-09-09"
 
 Parameters:
 
-  NetworkStackS3URL:
+  S3BaseUrl:
     Type: String
+    Description: "Base URL for S3 Bucket (https://my-bucket.s3.amazonaws.com/stacks/)"
 
-  SecurityGroupStackS3URL:
+  MyAmiId:
     Type: String
-
-  LoadBalancerStackS3URL:
-    Type: String
-
-  ComputeStackS3URL:
-    Type: String
-
-  CloudFrontStackS3URL:
-    Type: String
+    Description: AMI ID for Instances
 
 
 Resources:
@@ -23,19 +16,19 @@ Resources:
   NetworkStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Ref NetworkStackS3URL
+      TemplateURL: !Sub "${S3BaseUrl}network.yaml"
 
   SecurityGroupStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Ref SecurityGroupStackS3URL
+      TemplateURL: !Sub "${S3BaseUrl}securitygroup.yaml"
       Parameters: 
         MyVpcId: !GetAtt NetworkStack.Outputs.VpcId
 
   LoadBalancerStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Ref LoadBalancerStackS3URL
+      TemplateURL: !Sub "${S3BaseUrl}loadbalancer.yaml"
       Parameters:
         MyVpcId: !GetAtt NetworkStack.Outputs.VpcId
         MyPublicSubnet1Id: !GetAtt NetworkStack.Outputs.PublicSubnet1Id
@@ -45,16 +38,17 @@ Resources:
   ComputeStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Ref ComputeStackS3URL
+      TemplateURL: !Sub "${S3BaseUrl}compute.yaml"
       Parameters:
         MyPrivateSubnet1Id: !GetAtt NetworkStack.Outputs.PrivateSubnet1Id
         MyPrivateSubnet2Id: !GetAtt NetworkStack.Outputs.PrivateSubnet2Id
         MyTargetGroupArn: !GetAtt LoadBalancerStack.Outputs.TargetGroupArn
         MyEc2SgId: !GetAtt SecurityGroupStack.Outputs.Ec2SgId
+        MyAmiId: !Ref MyAmiId
 
   CloudFrontStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Ref CloudFrontStackS3URL
+      TemplateURL: !Sub "${S3BaseUrl}cloudfront.yaml"
       Parameters:
         MyAlbDnsName: !GetAtt LoadBalancerStack.Outputs.AlbDnsName
